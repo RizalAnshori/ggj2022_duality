@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class MazeSpawner : MonoBehaviour
 {
@@ -21,9 +23,11 @@ public class MazeSpawner : MonoBehaviour
     public bool AddGaps = false;
     public GameObject GoalPrefab = null;
     public List<GameObject> floors = new List<GameObject>();
+    public List<GameObject> cornerFloors = new List<GameObject>();
     private BasicMazeGenerator mMazeGenerator = null;
+
     // Start is called before the first frame update
-    void Start()
+    public void StartGenerateMaze(Action onCompleted = null)
     {
         if (!FullRandom)
         {
@@ -45,7 +49,13 @@ public class MazeSpawner : MonoBehaviour
                 MazeCell cell = mMazeGenerator.GetMazeCell(row, column);
                 GameObject tmp;
                 tmp = Instantiate(Floor, new Vector3(x, 0, z), Quaternion.Euler(0, 0, 0)) as GameObject;
+                tmp.name = $"floor: {row},{column}";
                 floors.Add(tmp);
+                if (IsCorner(row, column))
+                {
+                    cornerFloors.Add(tmp);
+                }
+
                 tmp.transform.parent = transform;
                 if (cell.WallRight)
                 {
@@ -87,5 +97,27 @@ public class MazeSpawner : MonoBehaviour
                 }
             }
         }
+        onCompleted?.Invoke();
+    }
+
+    private bool IsCorner(int row, int column)
+    {
+        if(row == 0 && column == 0)
+        {
+            return true;
+        }
+        else if(row == Rows-1 && column == Columns-1)
+        {
+            return true;
+        }
+        else if(row == 0 && column == Columns-1)
+        {
+            return true;
+        }
+        else if(row == Rows-1 && column == 0)
+        {
+            return true;
+        }
+        return false;
     }
 }
