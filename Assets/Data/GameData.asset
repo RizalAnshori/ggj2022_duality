@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: GameData
   m_EditorClassIdentifier: 
   playerAmount: 4
-  goalScore: 1
+  goalScore: 11
   spawnPositionEnum: 1

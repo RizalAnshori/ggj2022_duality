@@ -61,5 +61,6 @@ public class PlayerUINotification : MonoBehaviour
     private IEnumerator WaitIE(float duration, Action onComplete)
     {
         yield return new WaitForSeconds(duration);
+        onComplete.Invoke();
     }
 }
