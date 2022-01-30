@@ -6,6 +6,7 @@ using Random = UnityEngine.Random;
 
 public class MazeSpawner : MonoBehaviour
 {
+    [SerializeField] private GameData gameData;
     public enum MazeGenerationAlgorithm
     {
         PureRecursive
@@ -23,7 +24,7 @@ public class MazeSpawner : MonoBehaviour
     public bool AddGaps = false;
     public GameObject GoalPrefab = null;
     public List<GameObject> floors = new List<GameObject>();
-    public List<GameObject> cornerFloors = new List<GameObject>();
+    public List<GameObject> nonRamdomTargetPlacements = new List<GameObject>();
     private BasicMazeGenerator mMazeGenerator = null;
 
     // Start is called before the first frame update
@@ -48,34 +49,44 @@ public class MazeSpawner : MonoBehaviour
                 float z = row * (CellHeight + (AddGaps ? .2f : 0));
                 MazeCell cell = mMazeGenerator.GetMazeCell(row, column);
                 GameObject tmp;
-                tmp = Instantiate(Floor, new Vector3(x, 0, z), Quaternion.Euler(0, 0, 0)) as GameObject;
-                tmp.name = $"floor: {row},{column}";
-                floors.Add(tmp);
-                if (IsCorner(row, column))
+                var floor = Instantiate(Floor, new Vector3(x, 0, z), Quaternion.Euler(0, 0, 0)) as GameObject;
+                floor.name = $"floor: {row},{column}";
+                floors.Add(floor);
+                if (gameData.spawnPositionEnum == SpawnPositionEnum.Corner)
                 {
-                    cornerFloors.Add(tmp);
+                    if (IsCorner(row, column))
+                    {
+                        nonRamdomTargetPlacements.Add(floor);
+                    }
+                }
+                else if (gameData.spawnPositionEnum == SpawnPositionEnum.Center)
+                {
+                    if(column == Columns/2 && row == Rows/2)
+                    {
+                        nonRamdomTargetPlacements.Add(floor);
+                    }
                 }
 
-                tmp.transform.parent = transform;
+                floor.transform.parent = transform;
                 if (cell.WallRight)
                 {
                     tmp = Instantiate(Wall, new Vector3(x + CellWidth / 2, 0, z) + Wall.transform.position, Quaternion.Euler(0, 90, 0)) as GameObject;// right
-                    tmp.transform.parent = transform;
+                    tmp.transform.parent = floor.transform;
                 }
                 if (cell.WallFront)
                 {
                     tmp = Instantiate(Wall, new Vector3(x, 0, z + CellHeight / 2) + Wall.transform.position, Quaternion.Euler(0, 0, 0)) as GameObject;// front
-                    tmp.transform.parent = transform;
+                    tmp.transform.parent = floor.transform;
                 }
                 if (cell.WallLeft)
                 {
                     tmp = Instantiate(Wall, new Vector3(x - CellWidth / 2, 0, z) + Wall.transform.position, Quaternion.Euler(0, 270, 0)) as GameObject;// left
-                    tmp.transform.parent = transform;
+                    tmp.transform.parent = floor.transform;
                 }
                 if (cell.WallBack)
                 {
                     tmp = Instantiate(Wall, new Vector3(x, 0, z - CellHeight / 2) + Wall.transform.position, Quaternion.Euler(0, 180, 0)) as GameObject;// back
-                    tmp.transform.parent = transform;
+                    tmp.transform.parent = floor.transform;
                 }
                 if (cell.IsGoal && GoalPrefab != null)
                 {
@@ -95,6 +106,13 @@ public class MazeSpawner : MonoBehaviour
                     GameObject tmp = Instantiate(Pillar, new Vector3(x - CellWidth / 2, 0, z - CellHeight / 2), Pillar.transform.rotation) as GameObject;
                     tmp.transform.parent = transform;
                 }
+            }
+        }
+        if(gameData.spawnPositionEnum == SpawnPositionEnum.Center)
+        {
+            for(int i = 0; i < nonRamdomTargetPlacements[0].transform.childCount;i++)
+            {
+                nonRamdomTargetPlacements[0].transform.GetChild(i).gameObject.SetActive(false);
             }
         }
         onCompleted?.Invoke();

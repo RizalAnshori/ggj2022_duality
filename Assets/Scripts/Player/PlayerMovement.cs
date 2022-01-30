@@ -5,7 +5,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] CharacterController characterController;
+    [SerializeField] private Animator animator;
+    [SerializeField] private CharacterController characterController;
     [SerializeField] private float moveSpeed;
     [SerializeField] private Key up = Key.UpArrow;
     [SerializeField] private Key left = Key.LeftArrow;
@@ -26,9 +27,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        if (!canMove) return;
-
         Vector3 move = new Vector3(GetHorizontalValue(), 0, GetVerticalValue());
+        if (!canMove || move == Vector3.zero)
+        {
+            animator.Play("idle");
+            return;
+        }
         characterController.Move(move * Time.deltaTime * moveSpeed);
     }
 
@@ -36,10 +40,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if(Keyboard.current[right].isPressed)
         {
+            animator.Play("right");
             return 1;
         }
         else if(Keyboard.current[left].isPressed)
         {
+            animator.Play("left");
             return -1;
         }
 
@@ -50,10 +56,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Keyboard.current[up].isPressed)
         {
+            animator.Play("up");
             return 1;
         }
         else if (Keyboard.current[down].isPressed)
         {
+            animator.Play("down");
             return -1;
         }
 

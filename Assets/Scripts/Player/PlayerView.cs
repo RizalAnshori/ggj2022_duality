@@ -11,6 +11,11 @@ public class PlayerView : MonoBehaviour
         camera.rect = maxPlayer == 4 ? Setup4Player(playerOrder) : Setup2Player(playerOrder);
     }
 
+    public void ShowWinningScreen()
+    {
+        print($"{this.gameObject.name} is win");
+    }
+
     private Rect Setup4Player(int playerOrder)
     {
         return playerOrder switch

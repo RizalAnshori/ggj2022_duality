@@ -6,5 +6,13 @@ using UnityEngine;
 public class GameData : ScriptableObject
 {
     public int playerAmount = 4;
-    public bool spawnPlayerAtCorner = true;
+    public int goalScore = 16;
+    public SpawnPositionEnum spawnPositionEnum = SpawnPositionEnum.Corner;
+}
+
+public enum SpawnPositionEnum
+{
+    Corner,
+    Center,
+    Random
 }
